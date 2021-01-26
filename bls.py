@@ -3,6 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from scipy import sparse
 from scipy.sparse.linalg import spsolve
+from scipy.linalg import cholesky
 from scipy.interpolate import interp1d
 
 
@@ -25,35 +26,54 @@ def lininterp_baseline_subtract(y, x, left_ips, right_ips):
     return y - f(x)
 
 
-def baseline_als(y, lam, p, niter=10):
+def als_smoother(y, lam, p):
     """
-    Baseline subtracts by asymmetric least squares.
+    Asymmetric least squares smoother.
 
     Inputs:
       y: vector of data
       lmbd: weighting factor for smoothness
       p: weighting factor for asymmetry
+         p should always be less than 1, usually less than 0.1
+         for positive spectra
+         those points greater than the smoothed line are weighted little
+         those points lower than the smoothed line are weighted much
     Outputs:
       z: Least squares solution to Z*w*y
+         the smoothed spectrum
     Locals:
       L: Number of data points in spectrum
       D: Second order approximation of the second derivative
       w: Asymmetric weighting factors
       W: Diagonal matrix of asymmetric weighting factors
-      Z: Sum of asymmetric weighting factor and weighted smoothness matrix
+      Z: Linear combination of asymmetric weighting factors
+         and weighted smoothness matrix
     """
     L = len(y)
-    D = sparse.diags([1, -2, 1], [0, -1, -2], shape=(L, L - 2))
-    w = np.ones(L)
-    for i in range(niter):
+
+    D = sparse.diags([1, -2, 1], [0, -1, -2], shape=(L, L))
+    DD = D.transpose() @ D 
+    DDl = lam * DD # weighted smoothness matrix
+
+    w = np.ones(L) # initialize symmetric least squares
+    w0 = np.zeros(L) 
+
+    accumulator = 0
+    while abs(w - w0).sum() > 0.1 and accumulator < 200:
+        w0 = w
+        accumulator += 1
+
         W = sparse.spdiags(w, 0, L, L)
-        Z = W + lam * D.dot(D.transpose())
+        Z = W + DDl
         z = spsolve(Z, w * y)
         w = p * (y > z) + (1 - p) * (y < z)
+
+    if accumulator >= 200:
+        print('warning not converged in 200 iterations')
     return z
 
 
-def find_baseline_inspection(y, l_fineness=8, p_fineness=3, log10l_lims=[
+def als_smoothing_inspection(y, l_fineness=8, p_fineness=3, log10l_lims=[
                              2, 9], log10p_lims=[-3, 0]):
     """
 
@@ -67,11 +87,12 @@ def find_baseline_inspection(y, l_fineness=8, p_fineness=3, log10l_lims=[
     fig, axs = plt.subplots(nrows=len(lmbd_range), ncols=len(p_range))
     for c, lmbd in enumerate(lmbd_range):
         for d, p in enumerate(p_range):
-            yn = baseline_als(y, lmbd, p)
+            yn = als_smoother(y, lmbd, p)
             e = ((y - yn)**2).mean()
-            y2 = np.roll(yn, -2)
-            y1 = np.roll(yn, -1)
-            s = yn - 2 * y1 + y2
+            #y2 = np.roll(yn, -2)
+            #y1 = np.roll(yn, -1)
+            #s = yn - 2 * y1 + y2
+            axs[c, d].plot(y)
             axs[c, d].plot(yn)
             axs[c, d].set_xticks([])
             axs[c, d].set_yticks([])
@@ -84,7 +105,7 @@ def find_baseline_inspection(y, l_fineness=8, p_fineness=3, log10l_lims=[
     return fig, axs
 
 
-def find_baseline_quant(y, l_fineness=8, p_fineness=3,
+def als_smoothing_quantification(y, l_fineness=8, p_fineness=3,
                         log10l_lims=[2, 9], log10p_lims=[-3, 0]):
     """
 
@@ -102,7 +123,7 @@ def find_baseline_quant(y, l_fineness=8, p_fineness=3,
 
     for c, lmbd in enumerate(lmbd_range):
         for d, p in enumerate(p_range):
-            yn = baseline_als(y, lmbd, p)
+            yn = als_smoother(y, lmbd, p)
             e = ((y - yn)**2).mean()
             y2 = np.roll(yn, -2)
             y1 = np.roll(yn, -1)
@@ -130,3 +151,26 @@ def find_baseline_quant(y, l_fineness=8, p_fineness=3,
         r'$\langle \langle \Delta^2 z)^2 \rangle$ where $\Delta\equiv \frac{\delta^2 y}{\delta x^2}$')
 
     return fig, axs
+
+if __name__ == '__main__':
+
+    from py_chemplexity import read_data
+
+    # read in data
+    data = read_data('data/baseline-and-noisy-test-data.CH')
+    x = data['time']
+    y = data['tic']
+
+
+    #from whittaker_smooth import whittaker_smooth
+    #from bls import baseline_als, find_baseline_inspection, find_baseline_quant
+    als_smoothing_inspection(y, l_fineness=5, p_fineness=3, log10l_lims=[1, 5], log10p_lims=[-1, -0.301])
+    plt.show()
+#    l = input('lambda= ')
+#    p = input('p =')
+#
+#    find_baseline_quant(y)
+#    y = whittaker_smooth(y,lmbd=1.e5)
+#    y = baseline_als(y,lam=l, p=p,niter=10)
+#    # these are parameters optimum for a GC signal considered in the paper
+#    plt.plot(x,y)
