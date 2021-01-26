@@ -20,9 +20,9 @@ lg = 0.2
 
 y1 = gaussian(x, ampg, mg, sg)
 y2 = pseudovoigt(x, ampp, mp, sp, lg)
-encode('deconv.CH', y1 + y2 + r.random(len(y1)) / 10., xmin=0, xmax=1)
+encode('data/deconv.CH', y1 + y2 + r.random(len(y1)) / 10., xmin=0, xmax=1)
 
-data = read_data('deconv.CH')
+data = read_data('data/deconv.CH')
 x = data['time']
 y = data['tic']
 peak_pos, peak_prop = find_peaks(y, width=40, height=1, rel_height=0.99)
