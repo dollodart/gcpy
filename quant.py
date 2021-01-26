@@ -1,4 +1,4 @@
-from py_chemplexity import read_data
+from decode import read_data
 from bls import lininterp_baseline_subtract
 from scipy.signal import find_peaks, peak_widths
 from scipy.integrate import trapz

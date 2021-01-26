@@ -4,7 +4,7 @@ import numpy.random as r
 from lmfit import minimize, Parameters
 from rampy_funcs import *
 from encode import encode
-from py_chemplexity import read_data
+from decode import read_data
 from scipy.integrate import trapz
 from scipy.signal import find_peaks
 from bls import lininterp_baseline_subtract
