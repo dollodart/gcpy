@@ -11,7 +11,7 @@ these hardware and data acquisition issues are not here discussed.
 
 # Data I/O
 
-A decoder and encoder for Agilent .CH files is provided. 
+A decoder and encoder for Agilent .CH files is provided. The decoder was copied to python from the MATLAB Chemplexity package by James Dillon.
 
 Please do not try to use the encoder to fake data records. It only
 changes the bits at a few positions in the file. It might not
