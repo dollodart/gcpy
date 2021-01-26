@@ -39,7 +39,6 @@ def expose_decompress_double_delta(f, offset):
     prefix = 32767  # 2^15 - 1
     multiplier = 4294967296  # 2^33
     f.seek(offset)
-    signal = []
     read_val = diff_acc = write_val = 0
 
     count_a = count_b = 0
@@ -62,16 +61,23 @@ def expose_decompress_double_delta(f, offset):
 
 
 def decompress_delta(f, offset):
-    """Untested."""
+    """
+
+    Untested.
+
+    The double loop structure is only needed to find a break condition,
+    and a simpler single loop difference accumulation is possible even
+    with a break condition.
+
+    """
     end = f.seek(0, 2)
-    start = f.seek(0, 0)
 
     inner_prefix = -32678
     # in twos complement for a 16 bit
     # -32678 = ~2**15 + 1
     # 1011111111111111 + 1 = 1100000000000000
     comparison = 4095
-    # 4095 = 2**12 - 1
+    # 4095 = 2**12 - 1 = 0xfff
     # 0000111111111111
 
     signal = []
@@ -80,15 +86,17 @@ def decompress_delta(f, offset):
     while f.tell() < end:
         read_outer = struct.unpack('>h', f.read(2))[0]
         write_val = back_store
-        if read_outer == comparison:  # read_outer >> 12 == 0
+        # 0 <= read_outer <= 0xffff, comparison = 0xfff
+        if read_outer == comparison:
             break
-        for _ in range(
-                read_outer & comparison):  # not sure if range is correct here, no test data file
+        for _ in range(read_outer & comparison):
+            # not sure if range is correct here, no test data file
+            # at most 4095 differences are evaluated
             read_inner = struct.unpack('>h', f.read(2))[0]
             if read_inner != inner_prefix:
                 write_val += read_inner
             else:
-                write_val = struct.unpack('>i', f.read(4))
+                write_val = struct.unpack('>i', f.read(4))[0]
             signal.append(write_val)
         back_store = read_inner
 
