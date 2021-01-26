@@ -2,7 +2,7 @@ import numpy as np
 from scipy import sparse
 from scipy.sparse.linalg import spsolve, splu
 
-def als_smoother(y, lam, p):
+def als_smooth(y, lam, p):
     """
     Asymmetric least squares smoother.
 

@@ -1,5 +1,5 @@
 from gcpy.decode import read_data
-from gcpy.smoothers import als_smoother
+from gcpy.smooth import als_smooth
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -17,7 +17,7 @@ def als_smoothing_inspection(y, l_fineness=8, p_fineness=3, log10l_lims=[
     fig, axs = plt.subplots(nrows=len(lmbd_range), ncols=len(p_range))
     for c, lmbd in enumerate(lmbd_range):
         for d, p in enumerate(p_range):
-            yn = als_smoother(y, lmbd, p)
+            yn = als_smooth(y, lmbd, p)
             e = ((y - yn)**2).mean()
             #y2 = np.roll(yn, -2)
             #y1 = np.roll(yn, -1)
@@ -53,7 +53,7 @@ def als_smoothing_quantification(y, l_fineness=8, p_fineness=3,
 
     for c, lmbd in enumerate(lmbd_range):
         for d, p in enumerate(p_range):
-            yn = als_smoother(y, lmbd, p)
+            yn = als_smooth(y, lmbd, p)
             e = ((y - yn)**2).mean()
             y2 = np.roll(yn, -2)
             y1 = np.roll(yn, -1)
