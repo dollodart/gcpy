@@ -1,9 +1,9 @@
-from curve_funcs import gaussian
+from gcpy.curve_funcs import gaussian
+from gcpy.sensitivity_data import rtimes
+from gcpy.encode import encode
 import numpy.random as r
 import numpy as np
-from encode import encode
 
-from sensitivity_data import rtimes
 
 r.seed(232015092)
 xmin = 0

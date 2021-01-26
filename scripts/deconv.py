@@ -2,12 +2,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 import numpy.random as r
 from lmfit import minimize, Parameters
-from curve_funcs import *
-from encode import encode
-from decode import read_data
+from gcpy.curve_funcs import *
+from gcpy.encode import encode
+from gcpy.decode import read_data
+from gcpy.bls import lininterp_baseline_subtract
 from scipy.integrate import trapz
 from scipy.signal import find_peaks
-from bls import lininterp_baseline_subtract
 
 x = np.linspace(0, 1, 1000)
 ampg = 1

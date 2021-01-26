@@ -1,10 +1,10 @@
-from decode import read_data
-from bls import lininterp_baseline_subtract
+from gcpy.decode import read_data
+from gcpy.bls import lininterp_baseline_subtract
+from gcpy.sensitivity_data import species, rtimes, sens_facts
 from scipy.signal import find_peaks, peak_widths
 from scipy.integrate import trapz
 import matplotlib.pyplot as plt
 import numpy as np
-from sensitivity_data import species, rtimes, sens_facts
 
 # read in data
 data = read_data('data/test-data.CH')
