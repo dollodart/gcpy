@@ -57,18 +57,3 @@ for species, area in peaks_lst:
     comp = 100 * area / total
     if comp > 0.1:  # greater than 1 part in 1000
         print(f'{species}\t{comp:.2f}')
-
-# baseline subtraction alternative
-
-#from whittaker_smooth import whittaker_smooth
-#from bls import baseline_als, find_baseline_inspection, find_baseline_quant
-#find_baseline_inspection(y, l_fineness=4, p_fineness=2, log10l_lims=[
-#                         2, 5], log10p_lims=[-0.5, 0.5])
-#plt.show()
-#input('lambda= ')
-#input('p =')
-
-# find_baseline_quant(y)
-# y=whittaker_smooth(y,lmbd=1.e5)
-# y=baseline_als(y,lam=1.e5,p=0.01,niter=10) #these are parameters optimum for a GC signal considered in the paper
-# plt.plot(x,y)
