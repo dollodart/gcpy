@@ -1,4 +1,4 @@
-from rampy_funcs import gaussian
+from curve_funcs import gaussian
 import numpy.random as r
 import numpy as np
 from encode import encode

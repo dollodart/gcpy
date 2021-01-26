@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import numpy.random as r
 from lmfit import minimize, Parameters
-from rampy_funcs import *
+from curve_funcs import *
 from encode import encode
 from decode import read_data
 from scipy.integrate import trapz

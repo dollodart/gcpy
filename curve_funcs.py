@@ -1,6 +1,6 @@
 import numpy as np
 from scipy.special import erfc
-
+# implementations of curve functions taken from Rampy package
 
 def gaussian(x, amp, freq, HWHM):  # for spectral fit
     return amp * np.exp(-np.log(2) * ((x - freq) / HWHM)**2)
