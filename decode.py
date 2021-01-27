@@ -2,6 +2,7 @@ from datetime import datetime
 import struct
 import numpy as np
 
+
 def read_double_array(f, offset):
     end = f.seek(0, 2)
     f.seek(offset)
@@ -217,13 +218,11 @@ def read_data(f, version='181'):
         options['offset']['inlet'] = 2492
         options['offset']['units'] = 4172
 
-        f.seek(264)  # by default the offset is from beginning of file
-        offset = (struct.unpack('>i', f.read(4))[
-                  0] - 1) * 512  # i is by default 4 byte
+        f.seek(264)
+        offset = (struct.unpack('>i', f.read(4))[0] - 1) * 512
 
         f.seek(282)
-        xmin = struct.unpack('>f', f.read(4))[
-            0] / 60000.  # f in struct is by default 4 byte, need to specify big endian
+        xmin = struct.unpack('>f', f.read(4))[0] / 60000.
         xmax = struct.unpack('>f', f.read(4))[0] / 60000.
 
         f.seek(4724)
@@ -260,8 +259,7 @@ def read_data(f, version='181'):
         data['tic'] = decompress_double_delta(f, offset)
 
         f.seek(282)
-        xmin = struct.unpack('>f', f.read(4))[
-            0] / 60000.  # f in struct is by default 4 byte, need to specify big endian
+        xmin = struct.unpack('>f', f.read(4))[0] / 60000.
         xmax = struct.unpack('>f', f.read(4))[0] / 60000.
         data['time'] = np.linspace(xmin, xmax, len(data['tic']))
 
@@ -315,9 +313,11 @@ def read_data(f, version='181'):
     data['method']['operator'] = ''.join(
         [chr(x) for x in data['method']['operator']])
     data['method']['date'] = datetime.strptime(
-        ''.join([chr(x) for x in data['method']['date']]), '%d-%b-%y, %H:%M:%S').date()
+        ''.join([chr(x) for x in data['method']['date']]),
+        '%d-%b-%y, %H:%M:%S').date()
     data['method']['time'] = datetime.strptime(
-        ''.join([chr(x) for x in data['method']['time']]), '%d-%b-%y, %H:%M:%S').time()
+        ''.join([chr(x) for x in data['method']['time']]),
+        '%d-%b-%y, %H:%M:%S').time()
 
     f.close()
     return data

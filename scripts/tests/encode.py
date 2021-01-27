@@ -3,6 +3,7 @@ from gcpy.decode import read_data
 from gcpy.encode import encode
 import struct
 
+
 def expose_decompress_double_delta(f, offset):
     end = f.seek(0, 2)
     prefix = 32767  # 2^15 - 1
@@ -28,10 +29,12 @@ def expose_decompress_double_delta(f, offset):
 
     return count_a, count_b, read_val, diff_acc, write_val
 
-# show typical values for start position of data, slope and intercept of linear transform
+
+# show typical values for start position of data,
+# slope and intercept of linear transform
 with open('../data/sample.CH', 'rb') as f:
     f.seek(264)
-    offset = (struct.unpack('>i', f.read(4))[0] - 1) * 512  # i is by default 4 byte
+    offset = (struct.unpack('>i', f.read(4))[0] - 1) * 512
     f.seek(4724)
     intercept = struct.unpack('>d', f.read(8))
     f.seek(4732)
@@ -40,11 +43,10 @@ with open('../data/sample.CH', 'rb') as f:
 
 # show the history of the buffer in the decoder (used to make the encoder)
 with open('../data/sample.CH', 'rb') as f:
-    f.seek(264)  # by default the offset is from beginning of file
-    offset = (struct.unpack('>i', f.read(4))[
-              0] - 1) * 512  # i is by default 4 byte
+    f.seek(264)
+    offset = (struct.unpack('>i', f.read(4))[0] - 1) * 512
     ca, cb, rv, da, wv = expose_decompress_double_delta(f, offset)
-fig, axs = plt.subplots(nrows = 3, ncols = 1)
+fig, axs = plt.subplots(nrows=3, ncols=1)
 axs[0].plot(rv)
 axs[1].plot(da)
 axs[2].plot(wv)

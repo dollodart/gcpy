@@ -2,6 +2,7 @@ import numpy as np
 from scipy import sparse
 from scipy.sparse.linalg import spsolve, splu
 
+
 def als_smooth(y, lam, p):
     """
     Asymmetric least squares smoother.
@@ -28,11 +29,11 @@ def als_smooth(y, lam, p):
     L = len(y)
 
     D = sparse.diags([1, -2, 1], [0, -1, -2], shape=(L, L))
-    DD = D.transpose() @ D 
-    DDl = lam * DD # weighted smoothness matrix
+    DD = D.transpose() @ D
+    DDl = lam * DD  # weighted smoothness matrix
 
-    w = np.ones(L) # initialize symmetric least squares
-    w0 = np.zeros(L) 
+    w = np.ones(L)  # initialize symmetric least squares
+    w0 = np.zeros(L)
 
     accumulator = 0
     while abs(w - w0).sum() > 0.1 and accumulator < 200:
@@ -82,6 +83,8 @@ def als_smooth(y, lam, p):
 #
 # The fact that you are presently reading this means that you have had
 # knowledge of the CeCILL-B license and that you accept its terms.
+
+
 """
 WHITTAKER-EILERS SMOOTHER in Python 3 using numpy and scipy
 
@@ -96,6 +99,7 @@ Read the license text at the end of this file before using this software.
 Warm thanks go to Simon Bordeyne who pioneered a first (non-sparse) version
 of the smoother in Python.
 """
+
 
 def speyediff(N, d, format='csc'):
     """
@@ -123,7 +127,8 @@ def whittaker_smooth(y, lmbd, d=2):
     Implementation of the Whittaker smoothing algorithm,
     based on the work by Eilers [1].
 
-    [1] P. H. C. Eilers, "A perfect smoother", Anal. Chem. 2003, (75), 3631-3636
+    [1] P. H. C. Eilers, "A perfect smoother",
+    Anal. Chem. 2003, (75), 3631-3636
 
     The larger 'lmbd', the smoother the data.
     For smoothing of a complete data series, sampled at equal intervals
@@ -152,5 +157,3 @@ def whittaker_smooth(y, lmbd, d=2):
     coefmat = E + lmbd * D.conj().T.dot(D)
     z = splu(coefmat).solve(y)
     return z
-
-

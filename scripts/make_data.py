@@ -22,5 +22,6 @@ encode('data/test-data.CH', y)
 y += r.random(n) / 10
 encode('data/noisy-test-data.CH', y)
 
-y += np.hstack( (np.linspace(0, 0.5, n // 2) **2, (1 - np.linspace(0.5, 1, n // 2 + n % 2))**2 ) )
+y += np.hstack((np.linspace(0, 0.5, n // 2)**2,
+               (1 - np.linspace(0.5, 1, n // 2 + n % 2))**2))
 encode('data/baseline-and-noisy-test-data.CH', y)

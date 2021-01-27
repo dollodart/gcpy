@@ -1,6 +1,7 @@
 import numpy as np
 from scipy.interpolate import interp1d
 
+
 def lininterp_baseline_subtract(y, x, left_ips, right_ips):
     """
 
@@ -11,10 +12,8 @@ def lininterp_baseline_subtract(y, x, left_ips, right_ips):
     """
 
     keep = np.ones(len(x), dtype=bool)
-    for l, r in zip(left_ips, right_ips):
-        l = int(l)
-        r = int(r)
-        keep[l:r] = False
+    for left, right in zip(left_ips, right_ips):
+        keep[int(left):int(right)] = False
 
     f = interp1d(x[keep], y[keep])
     return y - f(x)

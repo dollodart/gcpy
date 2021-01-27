@@ -57,7 +57,7 @@ def simple_compress_double_delta(y):
     d = y - np.roll(y, 1)  # backwards difference
     dd = d - np.roll(d, 1)  # second backwards difference
     dd = dd[2:]
-    dd *= 32768 / abs(dd).max()  
+    dd *= 32768 / abs(dd).max()
     for i in dd:
         yield struct.pack('>h', int(i))
 
@@ -104,7 +104,8 @@ def compress_double_delta(f, y, limit=1000):
             f.write(struct.pack('>h', d2))
         else:  # start a new head (reference)
             f.write(struct.pack('>h', header))
-            # for whatver (possible compression) reason, the start value is represented as 2^33*h + I
+            # for whatver (possible compression) reason
+            # the start value is represented as 2^33*h + I
             # where h is a short and I is an unsigned long
             f.write(struct.pack('>h', 0))  # assign 0 arbitrarily
             f.write(struct.pack('>I', curr))
@@ -121,9 +122,10 @@ def encode(filename, ydata, meta=dict(), doe=dict(), xmin=0, xmax=1,
     f = open(filename, 'wb')
 
     # write meta data
-    # most characters are ASCII and so the H option just amounts to padding with zeroes
-    # I don't know why unsigned shorts rather than "char" are used unles they
-    # decided to support unicode at some point
+    # most characters are ASCII
+    # and so the H option just amounts to padding with zeroes
+    # I don't know why unsigned shorts rather than "char" are used
+    # they may have decided to support unicode
 
     if options_encoding == 'H':
         m = 2

@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 import numpy.random as r
 from lmfit import minimize, Parameters
-from gcpy.curve_funcs import *
+from gcpy.curve_funcs import gaussian, pseudovoigt
 from gcpy.encode import encode
 from gcpy.decode import read_data
 from gcpy.bls import lininterp_baseline_subtract
@@ -29,9 +29,8 @@ peak_pos, peak_prop = find_peaks(y, width=40, height=1, rel_height=0.99)
 y = lininterp_baseline_subtract(
     y, x, peak_prop['left_ips'], peak_prop['right_ips'])
 
-#plt.plot(x, y)
-# plt.show()
-#import sys; sys.exit()
+plt.plot(x, y)
+plt.show()
 
 # least square fit using lmfit
 
