@@ -1,3 +1,7 @@
+"""
+gcpy: python utilities for chromatographs
+Copyright (C) 2021 David Ollodart <LICENSE>
+"""
 from gcpy.curve_funcs import gaussian
 from gcpy.gcfactors import retention_tree
 from gcpy.encode import encode

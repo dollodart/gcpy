@@ -1,3 +1,7 @@
+"""
+gcpy: python utilities for chromatographs
+Copyright (C) 2021 David Ollodart <LICENSE>
+"""
 from gcpy.decode import read_data
 from gcpy.smooth import als_smooth
 import matplotlib.pyplot as plt

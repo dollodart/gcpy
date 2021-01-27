@@ -1,5 +1,11 @@
+"""
+Rampy: Python software for spectral data processing (IR, Raman, XAS...) 
+Curve fitting functions
+Copyright (c) 2015-2020 C. Le Losq 
+<https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html>
+"""
+
 import numpy as np
-# implementations of curve functions taken from Rampy package
 
 
 def gaussian(x, amp, freq, HWHM):  # for spectral fit

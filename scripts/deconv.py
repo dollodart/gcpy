@@ -1,3 +1,7 @@
+"""
+gcpy: python utilities for chromatographs
+Copyright (C) 2021 David Ollodart <LICENSE>
+"""
 import matplotlib.pyplot as plt
 import numpy as np
 import numpy.random as r

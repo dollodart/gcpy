@@ -1,3 +1,11 @@
+"""
+gcpy: python utilities for chromatographs
+Copyright (C) 2021 David Ollodart <LICENSE>
+
+Derivative of Chemplexity
+Copyright (c) 2014 James Dillon <The MIT License (MIT)>
+"""
+
 from datetime import datetime
 import struct
 import numpy as np

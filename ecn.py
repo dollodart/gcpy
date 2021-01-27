@@ -1,4 +1,7 @@
 """
+gcpy: python utilities for chromatographs
+Copyright (C) 2021 David Ollodart <LICENSE>
+
 Provided a networkx representation of the structure, determine the
 chemical identity of groups.  Most groups are defined by at most two
 edges of separation. For example a carboxyl group is

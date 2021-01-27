@@ -1,3 +1,7 @@
+"""
+gcpy: python utilities for chromatographs
+Copyright (C) 2021 David Ollodart <LICENSE>
+"""
 from gcpy.decode import read_data
 from gcpy.bls import lininterp_baseline_subtract
 from gcpy.gcfactors import sensitivity_factors

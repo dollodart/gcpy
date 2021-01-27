@@ -11,7 +11,8 @@ these hardware and data acquisition issues are not here discussed.
 
 # Data I/O
 
-A decoder and encoder for Agilent .CH files is provided. The decoder was copied to python from the MATLAB Chemplexity package by James Dillon.
+A decoder and encoder for Agilent .CH files is provided. The decoder was
+copied to python from the MATLAB Chemplexity package by James Dillon.
 
 Please do not try to use the encoder to fake data records. It only
 changes the bits at a few positions in the file. It might not
@@ -69,8 +70,10 @@ required data, e.g., to determine adsorption enthalpy, are not known.
 ## Baseline Subtraction
 
 The time resolution and sensitivity of modern chromatographs are so
-high that for most cases, a linear interpolation between the edges of
-a peak is sufficient to subtract the baseline. 
+high that for most cases, a linear interpolation between the edges of a
+peak is sufficient to subtract the baseline. Note the `rampy` package
+baseline module has a baseline subtraction function which uses all of
+these methods and more.
 
 ## Smoothing
 
@@ -137,3 +140,10 @@ definitions of functional groups in terms of SMARTS patterns.
 See "Calculation of flame ionization detector relative response factors
 using the effective carbon number concept" as a reference for the
 effective carbon numbers.
+
+Licensing: 
+rampy is licensed under GNU GPL 2.0 Copyright (c) 2015-2020 C. Le Losq, and is copied in part here
+Chemplexity is licensed under the The MIT License (MIT) Copyright (c) 2014 James Dillon, and is modified here
+Pysmiles is licensed under the Apache 2.0 Copyright (c) 2018 Peter C Kroon, and is a dependency
+
+All licenses are compatible with the here used GNU GPL 3.0.
