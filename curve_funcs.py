@@ -37,9 +37,8 @@ def gaussianarea(Amplitude, HWHM, **options):
 
 
 def pseudovoigt(x, amp, freq, HWHM, LGratio):  # for spectral fit
-    x -= freq
-    return LGratio * (amp / (1 + (x / HWHM)**2)) +\
-        (1 - LGratio) * (amp * np.exp(-np.log(2) * (x / HWHM)**2))
+    return LGratio * (amp / (1 + ( (x - freq) / HWHM)**2)) +\
+        (1 - LGratio) * (amp * np.exp(-np.log(2) * ( (x - freq) / HWHM)**2))
 
 
 def funlog(x, a, b, c, d):
