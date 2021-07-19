@@ -37,12 +37,12 @@ def smiles2carbontypes(smiles):
                 if n not in cyc_nodes:
                     cyc_nodes.append(n)
 
+    global dldct
     dldct = graph.nodes(data='element')
-    count = 0
+
     for node0 in graph.nodes:
 
         if dldct[node0] != 'C':
-            count += 1
             continue
             # only C atoms needed for ECN
 
@@ -63,80 +63,80 @@ def smiles2carbontypes(smiles):
         nbors1 = ''.join(sorted(nbors1))
         nbors2 = ''.join(sorted(nbors2))
 
-        ary = nbors1.count('C')
-        hyd = nbors1.count('H')
+        is_cycle = node0 in cyc_nodes
 
-        ln1 = len(nbors1)
-        if ln1 == ary + hyd:
-            # one only has to distinguish aromatic and non-aromatic for
-            # aliphatics for ECN.  however, this will classify incorrectly
-            # cycloalkenes as aromatics.  correct classification requires
-            # examining every atom (or every other atom) in the cycle and its
-            # nearest neighbors to determine if it is doubly bonded along the
-            # cycle.
-            if ln1 == 3 and node0 in cyc_nodes:
-                yield ary_dct[ary], 'aromatic'
-            else:
-                yield ary_dct[ary], alk_dct[ln1]
-    
-        if nbors1 == 'CCO':
-            yield '', 'ketone'
-        if nbors1 == 'CHO':
-            yield '', 'aldehyde'
+        yield classify(nbors1, nbors2, edge01, edge12, is_cycle)
 
-        if nbors1 == 'CHHO' or nbors1 == 'CCHO':
-            # look through (could be an ether)
-            # won't detect epoxides
-            is_ether = True
+
+def classify(nbors1, nbors2, edge01, edge12, is_cycle):
+    ary = nbors1.count('C')
+    hyd = nbors1.count('H')
+
+    ln1 = len(nbors1)
+    if ln1 == ary + hyd:
+        # one only has to distinguish aromatic and non-aromatic for
+        # aliphatics for ECN.  however, this will classify incorrectly
+        # cycloalkenes as aromatics.  correct classification requires
+        # examining every atom (or every other atom) in the cycle and its
+        # nearest neighbors to determine if it is doubly bonded along the
+        # cycle.
+        if ln1 == 3 and is_cycle:
+            return ary_dct[ary], 'aromatic'
+        return ary_dct[ary], alk_dct[ln1]
+
+    if nbors1 == 'CCO':
+        return '', 'ketone'
+    if nbors1 == 'CHO':
+        return '', 'aldehyde'
+
+    if nbors1 == 'CHHO' or nbors1 == 'CCHO':
+        # look through (could be an ether)
+        # won't detect epoxides
+        for i in range(len(edge01)):
+            if dldct[edge01[i]] == 'O':
+                n = edge12[i]
+                if len(n) == 1 and dldct[n[0]] == 'H':
+                    return ary_dct[ary], 'alcohol'
+        return '', 'ether'
+
+    if nbors1 == 'COO':
+        for i in range(len(edge01)):
+            if dldct[edge01[i]] == 'O':
+                n = edge12[i]
+                if len(n) == 1 and dldct[n[0]] == 'H':
+                    return '', 'carboxylic acid'
+        return '', 'acid anhydride or ester'
+        # requires 3rd nearest neighbors to discriminate
+
+    if 'N' in nbors1:
+        if nbors1 == 'CNO':
+            return '', 'amide'
+        elif nbors1 == 'CN':
+            return '', 'nitrile'
+        else:
             for i in range(len(edge01)):
-                if dldct[edge01[i]] == 'O':
+                if dldct[edge01[i]] == 'N':
                     n = edge12[i]
-                    if len(n) == 1 and dldct[n[0]] == 'H':
-                        is_ether = False
-                        yield ary_dct[ary], 'alcohol'
-            if is_ether:
-                yield '', 'ether'
+                    amine_ary = 1
+                    for j in n:
+                        if dldct[j] == 'C':
+                            return '', 'amine, or carbon adjacent to amide'
+                        elif dldct[j] == 'C':
+                            amine_ary += 1
+                    return ary_dct[amine_ary], 'amine'
 
-        if nbors1 == 'COO':
-            is_anhydride = True
-            for i in range(len(edge01)):
-                if dldct[edge01[i]] == 'O':
-                    n = edge12[i]
-                    if len(n) == 1 and dldct[n[0]] == 'H':
-                        is_anhydride = False
-                        yield '', 'carboxylic acid'
-            if is_anhydride:
-                yield '', 'acid anhydride or ester'
-                # requires 3rd nearest neighbors to discriminate
+    if 'S' in nbors1:
+        for i in range(len(edge01)):
+            if dldct[edge01[i]] == 'S':
+                n = edge12[i]
+                if len(n) == 1 and dldct[n[0]] == 'H':
+                    return '', 'thiol'
+                return '', 'sulfide'
 
-        if 'N' in nbors1:
-            if nbors1 == 'CNO':
-                yield '', 'amide'
-            elif nbors1 == 'CN':
-                yield '', 'nitrile'
-            else:
-                for i in range(len(edge01)):
-                    if dldct[edge01[i]] == 'N':
-                        n = edge12[i]
-                        is_amine = True
-                        amine_ary = 1
-                        for j in n:
-                            if dldct[j] == 'C':
-                                is_amine = False
-                                yield '', 'amine, or carbon adjacent to amide'
-                            elif dldct[j] == 'C':
-                                amine_ary += 1
-                        if is_amine:
-                            yield ary_dct[amine_ary], 'amine'
+    if 'F' in nbors1 or 'Cl' in nbors1 or 'Br' in nbors1 or 'I' in nbors1:
+        return ary_dct[ary], 'halide'
 
-        if 'S' in nbors1:
-            for i in range(len(edge01)):
-                if dldct[edge01[i]] == 'S':
-                    n = edge12[i]
-                    if len(n) == 1 and dldct[n[0]] == 'H':
-                        yield '', 'thiol'
-                    else:
-                        yield '', 'sulfide'
+    return '','unknown'
 
 
 class_dct = {'alkane': 'aliphatic',
@@ -186,6 +186,7 @@ ecn_dct = {"aliphatic": 1.00,
 
 ecn_dct = defaultdict(factory, ecn_dct)
 
+from time import time
 if __name__ == '__main__':
     principal_functional_groups = {  # from Carey, Giuliano 9th ed
         'Ethane': 'CC',
@@ -212,14 +213,18 @@ if __name__ == '__main__':
         'Ethanethiol': 'CCS',
         'Diethyl sulfide': 'CCSCC'}
 
-    for name in principal_functional_groups:
-        ecn = 0
-        smiles = principal_functional_groups[name]
-        for ary, typ in smiles2carbontypes(smiles):
-            if typ == 'alcohol':
-                typ = ary + ' ' + typ
-                ecn += ecn_dct[typ]
-            else:
-                ecn += ecn_dct[class_dct[typ]]
+    from time import time
+    t0 = time()
+    for _ in range(10):
+        for name in principal_functional_groups:
+            ecn = 0
+            smiles = principal_functional_groups[name]
+            for ary, typ in smiles2carbontypes(smiles):
+                if typ == 'alcohol':
+                    typ = ary + ' ' + typ
+                    ecn += ecn_dct[typ]
+                else:
+                    ecn += ecn_dct[class_dct[typ]]
 
-        print(name, ecn)
+#            print(name, ecn)
+    print(time() - t0)
