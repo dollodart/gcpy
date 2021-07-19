@@ -17,6 +17,7 @@ neighbors.
 
 """
 
+import networkx as nx
 from pysmiles.read_smiles import read_smiles
 from collections import defaultdict
 
@@ -26,6 +27,16 @@ alk_dct = {2: 'alkyne', 3: 'alkene', 4: 'alkane'}
 
 def smiles2carbontypes(smiles):
     graph = read_smiles(smiles, explicit_hydrogen=True)
+
+    cycles_list = nx.algorithms.cycle_basis(graph)
+    cyc_nodes = []
+    for cyc in cycles_list:
+        # non-aromatic cyclic atoms are not relevant for ECN
+        if len(cyc) % 2 == 0 and len(cyc) >= 4: 
+            for n in cyc:
+                if n not in cyc_nodes:
+                    cyc_nodes.append(n)
+
     dldct = graph.nodes(data='element')
     count = 0
     for node0 in graph.nodes:
@@ -57,8 +68,17 @@ def smiles2carbontypes(smiles):
 
         ln1 = len(nbors1)
         if ln1 == ary + hyd:
-            yield ary_dct[ary], alk_dct[ln1]
-
+            # one only has to distinguish aromatic and non-aromatic for
+            # aliphatics for ECN.  however, this will classify incorrectly
+            # cycloalkenes as aromatics.  correct classification requires
+            # examining every atom (or every other atom) in the cycle and its
+            # nearest neighbors to determine if it is doubly bonded along the
+            # cycle.
+            if ln1 == 3 and node0 in cyc_nodes:
+                yield ary_dct[ary], 'aromatic'
+            else:
+                yield ary_dct[ary], alk_dct[ln1]
+    
         if nbors1 == 'CCO':
             yield '', 'ketone'
         if nbors1 == 'CHO':
@@ -132,7 +152,8 @@ class_dct = {'alkane': 'aliphatic',
              'alcohol': 'alcohol',
              'acid anhydride': 'ester',  # may be carboxyl
              'amide': 'aliphatic',
-             'acid anhydride or ester': 'ester'  # ambiguous class
+             'acid anhydride or ester': 'ester',  # ambiguous class
+             'aromatic': 'aromatic'
             }
 
 
@@ -197,5 +218,8 @@ if __name__ == '__main__':
         for ary, typ in smiles2carbontypes(smiles):
             if typ == 'alcohol':
                 typ = ary + ' ' + typ
-            ecn += ecn_dct[class_dct[typ]]
+                ecn += ecn_dct[typ]
+            else:
+                ecn += ecn_dct[class_dct[typ]]
+
         print(name, ecn)
